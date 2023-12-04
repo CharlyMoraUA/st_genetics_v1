@@ -1,0 +1,53 @@
+@page "/animal"
+@inject st_genetics_v1.Services.AnimalService AnimalService
+
+<h3>Animal Page</h3>
+
+<!-- Animal Grid -->
+@if (animalList != null && animalList.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Animal ID</th>
+                <th>Name</th>
+                <th>Breed</th>
+                <th>Birth Date</th>
+                <th>Sex</th>
+                <th>Price</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var animal in animalList)
+            {
+                <tr>
+                    <td>@animal.AnimalId</td>
+                    <td>@animal.Name</td>
+                    <td>@animal.Breed</td>
+                    <td>@animal.BirthDate.ToShortDateString()</td>
+                    <td>@animal.Sex</td>
+                    <td>@animal.Price</td>
+                    <td>@animal.Status</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No animals found.</p>
+}
+
+@code {
+    private List<Models.Animal> animalList;
+
+    // Use an alias for the AnimalService property
+    [Inject]
+    private st_genetics_v1.Services.AnimalService AnimalServiceAlias { get; set; }
+
+    protected override void OnInitialized()
+    {
+        animalList = AnimalServiceAlias.GetAnimals();
+    }
+}
