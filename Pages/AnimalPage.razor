@@ -45,44 +45,70 @@
 </form>
 
 <!-- Animal Grid -->
-@if (filteredAnimalList != null && filteredAnimalList.Any())
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Animal ID</th>
-                <th>Name</th>
-                <th>Breed</th>
-                <th>Birth Date</th>
-                <th>Sex</th>
-                <th>Price</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var animal in filteredAnimalList)
-            {
-                <tr>
-                    <td>@animal.AnimalId</td>
-                    <td>@animal.Name</td>
-                    <td>@animal.Breed</td>
-                    <td>@animal.BirthDate.ToShortDateString()</td>
-                    <td>@animal.Sex</td>
-                    <td>@animal.Price</td>
-                    <td>@animal.Status</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <p class="mt-3">No animals found.</p>
-}
+<div class="row mt-4">
+    <!-- Add Animal Form -->
+    <div class="col-md-4">
+        <h4>Add Animal</h4>
+        <form @onsubmit="AddAnimal">
+            <div class="mb-3">
+                <label for="addName" class="form-label">Name:</label>
+                <input type="text" id="addName" class="form-control" @bind="newAnimal.Name" />
+            </div>
+            <!-- Add similar fields for other properties -->
+            <button type="submit" class="btn btn-success">Add</button>
+        </form>
+    </div>
+
+    <!-- Animal List -->
+    <div class="col-md-8">
+        @if (filteredAnimalList != null && filteredAnimalList.Any())
+        {
+            <h4>Animal List</h4>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Animal ID</th>
+                        <th>Name</th>
+                        <th>Breed</th>
+                        <th>Birth Date</th>
+                        <th>Sex</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var animal in filteredAnimalList)
+                    {
+                        <tr>
+                            <td>@animal.AnimalId</td>
+                            <td>@animal.Name</td>
+                            <td>@animal.Breed</td>
+                            <td>@animal.BirthDate.ToShortDateString()</td>
+                            <td>@animal.Sex</td>
+                            <td>@animal.Price</td>
+                            <td>@animal.Status</td>
+                            <td>
+                                <button class="btn btn-warning" @onclick="() => EditAnimal(animal)">Edit</button>
+                                <button class="btn btn-danger" @onclick="() => DeleteAnimal(animal.AnimalId)">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="mt-3">No animals found.</p>
+        }
+    </div>
+</div>
 
 @code {
     private List<Models.Animal> animalList;
     private List<Models.Animal> filteredAnimalList;
+    private Models.Animal newAnimal = new Models.Animal(); // Used for adding a new animal
+    private Models.Animal editingAnimal; // Used for editing an existing animal
 
     // Filter criteria
     private string filterName = "";
@@ -111,5 +137,54 @@ else
                 (!filterPrice.HasValue || a.Price == filterPrice.Value) &&
                 (string.IsNullOrEmpty(filterStatus) || a.Status == filterStatus))
             .ToList();
+    }
+
+
+    // Add Animal
+    private async Task AddAnimal()
+    {
+        // Save to the backend using AnimalService
+        await AnimalService.AddAnimalAsync(newAnimal);
+        // Clear the form
+        newAnimal = new Models.Animal();
+        // Refresh the filtered list
+        FilterAnimals();
+    }
+
+    // Edit Animal
+    private void EditAnimal(Models.Animal animal)
+    {
+        editingAnimal = animal;
+        // Set the form fields to the values of the editing animal
+        newAnimal.Name = animal.Name;
+        // Set other fields accordingly
+    }
+
+    // Update Animal
+    private async Task UpdateAnimal()
+    {
+        // Perform validation if necessary
+        // Update the original animal in the list
+        int index = animalList.FindIndex(a => a.AnimalId == editingAnimal.AnimalId);
+        if (index != -1)
+        {
+            animalList[index] = newAnimal;
+            // Save to the backend using AnimalService
+            await AnimalService.UpdateAnimalAsync(newAnimal);
+            // Clear the form and editingAnimal
+            newAnimal = new Models.Animal();
+            editingAnimal = null;
+            // Refresh the filtered list
+            FilterAnimals();
+        }
+    }
+
+    // Delete Animal
+    private async Task DeleteAnimal(int animalId)
+    {
+        // Save to the backend using AnimalService
+        await AnimalService.DeleteAnimalAsync(animalId);
+        // Refresh the filtered list
+        FilterAnimals();
     }
 }
