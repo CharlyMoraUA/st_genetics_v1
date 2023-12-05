@@ -251,6 +251,13 @@
     </table>
 </div>
 
+<div class="mt-4">
+    <h4>Purchase Information</h4>
+    <p>Total Purchase Amount: @CalculatePurchaseInformation().TotalPurchaseAmount.ToString("C")</p>
+    <p>Discount Amount: @CalculatePurchaseInformation().DiscountAmount.ToString("C")</p>
+    <p>Shipping Amount: @CalculatePurchaseInformation().ShippingAmount.ToString("C")</p>
+    <p>Total to Pay: @CalculatePurchaseInformation().TotalToPay.ToString("C")</p>
+</div>
 
 @code {
     private List<Models.Animal> animalList;
@@ -376,29 +383,29 @@
     }
 
     // Group animals by breed for the grouped animals table
-private IEnumerable<GroupedAnimal> GetGroupedAnimals()
-{
-    if (animalList == null || selectedAnimals == null)
+    private IEnumerable<GroupedAnimal> GetGroupedAnimals()
     {
-        return Enumerable.Empty<GroupedAnimal>();
-    }
+        if (animalList == null || selectedAnimals == null)
+        {
+            return Enumerable.Empty<GroupedAnimal>();
+        }
 
-    var selectedAnimalIds = selectedAnimals
+        var selectedAnimalIds = selectedAnimals
         .Where(kv => kv.Value)
         .Select(kv => kv.Key)
         .ToList();
 
-    var groupedAnimals = animalList
+        var groupedAnimals = animalList
         .Where(a => selectedAnimalIds.Contains(a.AnimalId))
         .GroupBy(a => a.Breed)
         .Select(group => new GroupedAnimal
-        {
-            Breed = group.Key,
-            SelectedAnimals = group.ToList()
-        });
+            {
+                Breed = group.Key,
+                SelectedAnimals = group.ToList()
+            });
 
-    return groupedAnimals;
-}
+        return groupedAnimals;
+    }
 
 
 
@@ -408,4 +415,47 @@ private IEnumerable<GroupedAnimal> GetGroupedAnimals()
         public string Breed { get; set; }
         public List<Models.Animal> SelectedAnimals { get; set; }
     }
+
+    private (decimal TotalPurchaseAmount, decimal DiscountAmount, decimal ShippingAmount, decimal TotalToPay)
+    CalculatePurchaseInformation()
+    {
+        decimal totalPurchaseAmount = 0;
+        decimal discountPercentage = 0;
+        decimal shippingAmount = 0;
+
+        // Calculate total purchase amount
+        totalPurchaseAmount = GetGroupedAnimals().Sum(group => group.SelectedAnimals.Sum(animal => animal.Price));
+
+        // Check if the customer adds an animal with a quantity greater than 5
+        if (GetGroupedAnimals().Any(group => group.SelectedAnimals.Count > 5))
+        {
+            discountPercentage += 5;
+        }
+
+        // Check if the customer buys more than 10 animals
+        if (GetGroupedAnimals().Sum(group => group.SelectedAnimals.Count) > 10)
+        {
+            discountPercentage += 3;
+        }
+
+        // Check if the customer buys more than 20 animals
+        if (GetGroupedAnimals().Sum(group => group.SelectedAnimals.Count) > 20)
+        {
+            shippingAmount = 0; // Free shipping
+        }
+        else
+        {
+            shippingAmount = 1000; // $1,000.00 for shipping
+        }
+
+        // Calculate discount amount
+        decimal discountAmount = totalPurchaseAmount * (discountPercentage / 100);
+
+        // Calculate total to pay
+        decimal totalToPay = totalPurchaseAmount - discountAmount + shippingAmount;
+
+        return (totalPurchaseAmount, discountAmount, shippingAmount, totalToPay);
+    }
+
+
 }
