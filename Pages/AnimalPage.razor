@@ -371,14 +371,13 @@
         await AnimalService.DeleteAnimalAsync(animalId);
         FilterAnimals();
     }
+    
     // Checkbox selection handling
     private void ToggleSelection(Models.Animal animal)
     {
         if (selectedAnimals.ContainsKey(animal.AnimalId))
         {
             selectedAnimals[animal.AnimalId] = !selectedAnimals[animal.AnimalId];
-
-            // Update grouped animals table
             StateHasChanged();
         }
     }

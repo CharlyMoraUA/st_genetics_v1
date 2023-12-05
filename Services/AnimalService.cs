@@ -42,10 +42,7 @@ namespace st_genetics_v1.Services
 
         public async Task AddAnimalAsync(Animal newAnimal)
         {
-            // Find the maximum existing AnimalId
             int maxAnimalId = _animals.Any() ? _animals.Max(a => a.AnimalId) : 0;
-
-            // Assign a unique ID to the new animal
             newAnimal.AnimalId = maxAnimalId + 1;
 
             _animals.Add(newAnimal);
@@ -61,22 +58,6 @@ namespace st_genetics_v1.Services
             {
                 _animals[index] = updatedAnimal;
                 await SaveChangesToFileAsync();
-            }
-        }
-
-        public async Task UpdateAnimalPropertyAsync(int animalId, string propertyName, string propertyValue)
-        {
-            // Update a specific property of the animal
-            var animalToUpdate = _animals.Find(a => a.AnimalId == animalId);
-            if (animalToUpdate != null)
-            {
-                // Use reflection to set the property value dynamically
-                var propertyInfo = typeof(Animal).GetProperty(propertyName);
-                if (propertyInfo != null)
-                {
-                    propertyInfo.SetValue(animalToUpdate, Convert.ChangeType(propertyValue, propertyInfo.PropertyType));
-                    await SaveChangesToFileAsync();
-                }
             }
         }
 
