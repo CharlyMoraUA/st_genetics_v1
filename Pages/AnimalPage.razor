@@ -3,10 +3,51 @@
 
 <h3>Animal Page</h3>
 
+<!-- Filter Form -->
+<form class="mb-4" @onsubmit="FilterAnimals">
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label for="name" class="form-label">Name:</label>
+            <input type="text" id="name" class="form-control" @bind="filterName" />
+        </div>
+        <div class="col-md-4">
+            <label for="breed" class="form-label">Breed:</label>
+            <input type="text" id="breed" class="form-control" @bind="filterBreed" />
+        </div>
+        <div class="col-md-4">
+            <label for="birthDate" class="form-label">Birth Date:</label>
+            <input type="date" id="birthDate" class="form-control" @bind="filterBirthDate" />
+        </div>
+        <div class="col-md-4">
+            <label for="sex" class="form-label">Sex:</label>
+            <select id="sex" class="form-select" @bind="filterSex">
+                <option value="">All</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="price" class="form-label">Price:</label>
+            <input type="number" id="price" class="form-control" @bind="filterPrice" />
+        </div>
+        <div class="col-md-4">
+            <label for="status" class="form-label">Status:</label>
+            <select id="status" class="form-select" @bind="filterStatus">
+                <option value="">All</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+        </div>
+        <div class="col-md-12 mt-3">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </div>
+</form>
+
 <!-- Animal Grid -->
-@if (animalList != null && animalList.Any())
+@if (filteredAnimalList != null && filteredAnimalList.Any())
 {
-    <table class="table">
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>Animal ID</th>
@@ -19,7 +60,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var animal in animalList)
+            @foreach (var animal in filteredAnimalList)
             {
                 <tr>
                     <td>@animal.AnimalId</td>
@@ -36,18 +77,39 @@
 }
 else
 {
-    <p>No animals found.</p>
+    <p class="mt-3">No animals found.</p>
 }
 
 @code {
-
-
-
     private List<Models.Animal> animalList;
+    private List<Models.Animal> filteredAnimalList;
+
+    // Filter criteria
+    private string filterName = "";
+    private string filterBreed = "";
+    private DateTime? filterBirthDate;
+    private string filterSex = "";
+    private decimal? filterPrice;
+    private string filterStatus = "";
 
     protected override async Task OnInitializedAsync()
     {
         await AnimalService.LoadAnimalsAsync();
         animalList = AnimalService.GetAnimals();
+        filteredAnimalList = new List<Models.Animal>(animalList);
+    }
+
+    private void FilterAnimals()
+    {
+        // Apply filters based on criteria
+        filteredAnimalList = animalList
+            .Where(a =>
+                (string.IsNullOrEmpty(filterName) || a.Name.Contains(filterName, StringComparison.OrdinalIgnoreCase)) &&
+                (string.IsNullOrEmpty(filterBreed) || a.Breed.Contains(filterBreed, StringComparison.OrdinalIgnoreCase)) &&
+                (!filterBirthDate.HasValue || a.BirthDate.Date == filterBirthDate.Value.Date) &&
+                (string.IsNullOrEmpty(filterSex) || a.Sex == filterSex) &&
+                (!filterPrice.HasValue || a.Price == filterPrice.Value) &&
+                (string.IsNullOrEmpty(filterStatus) || a.Status == filterStatus))
+            .ToList();
     }
 }

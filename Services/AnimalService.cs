@@ -1,10 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text.Json;
-using System.Threading.Tasks;
 using st_genetics_v1.Models;
 
 namespace st_genetics_v1.Services
@@ -42,18 +36,5 @@ namespace st_genetics_v1.Services
             }
         }
 
-
-        private void WriteToJson(List<Animal> animals, string filePath)
-        {
-            try
-            {
-                var jsonData = JsonSerializer.Serialize(animals, new JsonSerializerOptions { WriteIndented = true });
-                File.WriteAllText(filePath, jsonData);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error writing to JSON file: {ex.Message}");
-            }
-        }
     }
 }
