@@ -47,43 +47,43 @@
 <!-- Animal Grid -->
 <div class="row mt-4">
 
-<!-- Add Animal Form -->
-<div class="col-md-4">
-    <h4>Add Animal</h4>
-    <form @onsubmit="AddAnimal">
-        <div class="mb-3">
-            <label for="addName" class="form-label">Name:</label>
-            <input type="text" id="addName" class="form-control" @bind="newAnimal.Name" />
-        </div>
-        <div class="mb-3">
-            <label for="addBreed" class="form-label">Breed:</label>
-            <input type="text" id="addBreed" class="form-control" @bind="newAnimal.Breed" />
-        </div>
-        <div class="mb-3">
-            <label for="addBirthDate" class="form-label">Birth Date:</label>
-            <input type="date" id="addBirthDate" class="form-control" @bind="newAnimal.BirthDate" />
-        </div>
-        <div class="mb-3">
-            <label for="addSex" class="form-label">Sex:</label>
-            <select id="addSex" class="form-select" @bind="newAnimal.Sex">
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="addPrice" class="form-label">Price:</label>
-            <input type="number" id="addPrice" class="form-control" @bind="newAnimal.Price" />
-        </div>
-        <div class="mb-3">
-            <label for="addStatus" class="form-label">Status:</label>
-            <select id="addStatus" class="form-select" @bind="newAnimal.Status">
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-            </select>
-        </div>
-        <button type="submit" class="btn btn-success">Add</button>
-    </form>
-</div>
+    <!-- Add Animal Form -->
+    <div class="col-md-4">
+        <h4>Add Animal</h4>
+        <form @onsubmit="AddAnimal">
+            <div class="mb-3">
+                <label for="addName" class="form-label">Name:</label>
+                <input type="text" id="addName" class="form-control" @bind="newAnimal.Name" />
+            </div>
+            <div class="mb-3">
+                <label for="addBreed" class="form-label">Breed:</label>
+                <input type="text" id="addBreed" class="form-control" @bind="newAnimal.Breed" />
+            </div>
+            <div class="mb-3">
+                <label for="addBirthDate" class="form-label">Birth Date:</label>
+                <input type="date" id="addBirthDate" class="form-control" @bind="newAnimal.BirthDate" />
+            </div>
+            <div class="mb-3">
+                <label for="addSex" class="form-label">Sex:</label>
+                <select id="addSex" class="form-select" @bind="newAnimal.Sex">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="addPrice" class="form-label">Price:</label>
+                <input type="number" id="addPrice" class="form-control" @bind="newAnimal.Price" />
+            </div>
+            <div class="mb-3">
+                <label for="addStatus" class="form-label">Status:</label>
+                <select id="addStatus" class="form-select" @bind="newAnimal.Status">
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-success">Add</button>
+        </form>
+    </div>
 
 
     <!-- Animal List -->
@@ -105,7 +105,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var animal in filteredAnimalList)
+                    @foreach (var animal in GetVisibleAnimals())
                     {
                         <tr>
                             <td>@animal.AnimalId</td>
@@ -190,6 +190,16 @@
                     }
                 </tbody>
             </table>
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+        @for (int inx = 1; inx <= TotalPages(); inx++)
+        {
+            int currentPage = inx; // Use a local variable
+            <button class="btn btn-outline-primary @(inx == CurrentPage ? "active" : "")" @onclick="() => ChangePage(currentPage)">@inx</button>
+        }
+
+                </ul>
+            </nav>
         }
         else
         {
@@ -212,6 +222,29 @@
     private decimal? filterPrice;
     private string filterStatus = "";
 
+    // Pagination
+    private int PageSize = 10;
+    private int CurrentPage = 1;
+
+    private IEnumerable<Models.Animal> GetVisibleAnimals()
+    {
+        return filteredAnimalList
+        .Skip((CurrentPage - 1) * PageSize)
+        .Take(PageSize);
+    }
+
+    private int TotalPages()
+    {
+        int totalpages = (int)Math.Ceiling(filteredAnimalList.Count() / (double)PageSize);
+        return totalpages;
+    }
+
+    private void ChangePage(int curpage)
+    {
+        CurrentPage = curpage;
+        StateHasChanged(); // Ensure the component re-renders
+    }
+
     protected override async Task OnInitializedAsync()
     {
         await AnimalService.LoadAnimalsAsync();
@@ -223,14 +256,14 @@
     {
         // Apply filters based on criteria
         filteredAnimalList = animalList
-            .Where(a =>
-                (string.IsNullOrEmpty(filterName) || a.Name.Contains(filterName, StringComparison.OrdinalIgnoreCase)) &&
-                (string.IsNullOrEmpty(filterBreed) || a.Breed.Contains(filterBreed, StringComparison.OrdinalIgnoreCase)) &&
-                (!filterBirthDate.HasValue || a.BirthDate.Date == filterBirthDate.Value.Date) &&
-                (string.IsNullOrEmpty(filterSex) || a.Sex == filterSex) &&
-                (!filterPrice.HasValue || a.Price == filterPrice.Value) &&
-                (string.IsNullOrEmpty(filterStatus) || a.Status == filterStatus))
-            .ToList();
+        .Where(a =>
+        (string.IsNullOrEmpty(filterName) || a.Name.Contains(filterName, StringComparison.OrdinalIgnoreCase)) &&
+        (string.IsNullOrEmpty(filterBreed) || a.Breed.Contains(filterBreed, StringComparison.OrdinalIgnoreCase)) &&
+        (!filterBirthDate.HasValue || a.BirthDate.Date == filterBirthDate.Value.Date) &&
+        (string.IsNullOrEmpty(filterSex) || a.Sex == filterSex) &&
+        (!filterPrice.HasValue || a.Price == filterPrice.Value) &&
+        (string.IsNullOrEmpty(filterStatus) || a.Status == filterStatus))
+        .ToList();
     }
 
     // Add Animal
@@ -246,15 +279,15 @@
     {
         editingAnimal = animal;
         newAnimal = new Models.Animal
-        {
-            AnimalId = animal.AnimalId,
-            Name = animal.Name,
-            Breed = animal.Breed,
-            BirthDate = animal.BirthDate,
-            Sex = animal.Sex,
-            Price = animal.Price,
-            Status = animal.Status
-        };
+            {
+                AnimalId = animal.AnimalId,
+                Name = animal.Name,
+                Breed = animal.Breed,
+                BirthDate = animal.BirthDate,
+                Sex = animal.Sex,
+                Price = animal.Price,
+                Status = animal.Status
+            };
     }
 
 
