@@ -376,24 +376,30 @@
     }
 
     // Group animals by breed for the grouped animals table
-    private IEnumerable<GroupedAnimal> GetGroupedAnimals()
+private IEnumerable<GroupedAnimal> GetGroupedAnimals()
+{
+    if (animalList == null || selectedAnimals == null)
     {
-        if (selectedAnimals == null)
-        {
-            return Enumerable.Empty<GroupedAnimal>();
-        }
+        return Enumerable.Empty<GroupedAnimal>();
+    }
 
-        var groupedAnimals = animalList
-        .Where(a => selectedAnimals.ContainsKey(a.AnimalId) && selectedAnimals[a.AnimalId])
+    var selectedAnimalIds = selectedAnimals
+        .Where(kv => kv.Value)
+        .Select(kv => kv.Key)
+        .ToList();
+
+    var groupedAnimals = animalList
+        .Where(a => selectedAnimalIds.Contains(a.AnimalId))
         .GroupBy(a => a.Breed)
         .Select(group => new GroupedAnimal
-            {
-                Breed = group.Key,
-                SelectedAnimals = group.ToList()
-            });
+        {
+            Breed = group.Key,
+            SelectedAnimals = group.ToList()
+        });
 
-        return groupedAnimals;
-    }
+    return groupedAnimals;
+}
+
 
 
     // Class to represent grouped animals
