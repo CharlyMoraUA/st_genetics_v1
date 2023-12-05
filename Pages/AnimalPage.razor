@@ -46,18 +46,45 @@
 
 <!-- Animal Grid -->
 <div class="row mt-4">
-    <!-- Add Animal Form -->
-    <div class="col-md-4">
-        <h4>Add Animal</h4>
-        <form @onsubmit="AddAnimal">
-            <div class="mb-3">
-                <label for="addName" class="form-label">Name:</label>
-                <input type="text" id="addName" class="form-control" @bind="newAnimal.Name" />
-            </div>
-            <!-- Add similar fields for other properties -->
-            <button type="submit" class="btn btn-success">Add</button>
-        </form>
-    </div>
+
+<!-- Add Animal Form -->
+<div class="col-md-4">
+    <h4>Add Animal</h4>
+    <form @onsubmit="AddAnimal">
+        <div class="mb-3">
+            <label for="addName" class="form-label">Name:</label>
+            <input type="text" id="addName" class="form-control" @bind="newAnimal.Name" />
+        </div>
+        <div class="mb-3">
+            <label for="addBreed" class="form-label">Breed:</label>
+            <input type="text" id="addBreed" class="form-control" @bind="newAnimal.Breed" />
+        </div>
+        <div class="mb-3">
+            <label for="addBirthDate" class="form-label">Birth Date:</label>
+            <input type="date" id="addBirthDate" class="form-control" @bind="newAnimal.BirthDate" />
+        </div>
+        <div class="mb-3">
+            <label for="addSex" class="form-label">Sex:</label>
+            <select id="addSex" class="form-select" @bind="newAnimal.Sex">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="addPrice" class="form-label">Price:</label>
+            <input type="number" id="addPrice" class="form-control" @bind="newAnimal.Price" />
+        </div>
+        <div class="mb-3">
+            <label for="addStatus" class="form-label">Status:</label>
+            <select id="addStatus" class="form-select" @bind="newAnimal.Status">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-success">Add</button>
+    </form>
+</div>
+
 
     <!-- Animal List -->
     <div class="col-md-8">
@@ -82,15 +109,82 @@
                     {
                         <tr>
                             <td>@animal.AnimalId</td>
-                            <td>@animal.Name</td>
-                            <td>@animal.Breed</td>
-                            <td>@animal.BirthDate.ToShortDateString()</td>
-                            <td>@animal.Sex</td>
-                            <td>@animal.Price</td>
-                            <td>@animal.Status</td>
                             <td>
-                                <button class="btn btn-warning" @onclick="() => EditAnimal(animal)">Edit</button>
-                                <button class="btn btn-danger" @onclick="() => DeleteAnimal(animal.AnimalId)">Delete</button>
+                                @if (editingAnimal != null && editingAnimal.AnimalId == animal.AnimalId)
+                                {
+                                    <input type="text" @bind="newAnimal.Name" class="form-control" />
+                                }
+                                else
+                                {
+                                    @animal.Name
+                                }
+                            </td>
+                            <td>
+                                @if (editingAnimal != null && editingAnimal.AnimalId == animal.AnimalId)
+                                {
+                                    <input type="text" @bind="newAnimal.Breed" class="form-control" />
+                                }
+                                else
+                                {
+                                    @animal.Breed
+                                }
+                            </td>
+                            <td>
+                                @if (editingAnimal != null && editingAnimal.AnimalId == animal.AnimalId)
+                                {
+                                    <input type="date" @bind="newAnimal.BirthDate" class="form-control" />
+                                }
+                                else
+                                {
+                                    @animal.BirthDate.ToShortDateString()
+                                }
+                            </td>
+                            <td>
+                                @if (editingAnimal != null && editingAnimal.AnimalId == animal.AnimalId)
+                                {
+                                    <select @bind="newAnimal.Sex" class="form-select">
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                }
+                                else
+                                {
+                                    @animal.Sex
+                                }
+                            </td>
+                            <td>
+                                @if (editingAnimal != null && editingAnimal.AnimalId == animal.AnimalId)
+                                {
+                                    <input type="number" @bind="newAnimal.Price" class="form-control" />
+                                }
+                                else
+                                {
+                                    @animal.Price
+                                }
+                            </td>
+                            <td>
+                                @if (editingAnimal != null && editingAnimal.AnimalId == animal.AnimalId)
+                                {
+                                    <select @bind="newAnimal.Status" class="form-select">
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                    </select>
+                                }
+                                else
+                                {
+                                    @animal.Status
+                                }
+                            </td>
+                            <td>
+                                @if (editingAnimal != null && editingAnimal.AnimalId == animal.AnimalId)
+                                {
+                                    <button class="btn btn-success" @onclick="UpdateAnimal">Save</button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-warning" @onclick="() => EditAnimal(animal)">Edit</button>
+                                    <button class="btn btn-danger" @onclick="() => DeleteAnimal(animal.AnimalId)">Delete</button>
+                                }
                             </td>
                         </tr>
                     }
@@ -139,15 +233,11 @@
             .ToList();
     }
 
-
     // Add Animal
     private async Task AddAnimal()
     {
-        // Save to the backend using AnimalService
         await AnimalService.AddAnimalAsync(newAnimal);
-        // Clear the form
         newAnimal = new Models.Animal();
-        // Refresh the filtered list
         FilterAnimals();
     }
 
@@ -155,26 +245,29 @@
     private void EditAnimal(Models.Animal animal)
     {
         editingAnimal = animal;
-        // Set the form fields to the values of the editing animal
-        newAnimal.Name = animal.Name;
-        // Set other fields accordingly
+        newAnimal = new Models.Animal
+        {
+            AnimalId = animal.AnimalId,
+            Name = animal.Name,
+            Breed = animal.Breed,
+            BirthDate = animal.BirthDate,
+            Sex = animal.Sex,
+            Price = animal.Price,
+            Status = animal.Status
+        };
     }
+
 
     // Update Animal
     private async Task UpdateAnimal()
     {
-        // Perform validation if necessary
-        // Update the original animal in the list
         int index = animalList.FindIndex(a => a.AnimalId == editingAnimal.AnimalId);
         if (index != -1)
         {
             animalList[index] = newAnimal;
-            // Save to the backend using AnimalService
             await AnimalService.UpdateAnimalAsync(newAnimal);
-            // Clear the form and editingAnimal
             newAnimal = new Models.Animal();
             editingAnimal = null;
-            // Refresh the filtered list
             FilterAnimals();
         }
     }
@@ -182,9 +275,7 @@
     // Delete Animal
     private async Task DeleteAnimal(int animalId)
     {
-        // Save to the backend using AnimalService
         await AnimalService.DeleteAnimalAsync(animalId);
-        // Refresh the filtered list
         FilterAnimals();
     }
 }
