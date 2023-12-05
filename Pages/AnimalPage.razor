@@ -94,6 +94,7 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
+                        <th>Select</th>
                         <th>Animal ID</th>
                         <th>Name</th>
                         <th>Breed</th>
@@ -108,6 +109,9 @@
                     @foreach (var animal in GetVisibleAnimals())
                     {
                         <tr>
+                            <td>
+                                <input type="checkbox" @bind="selectedAnimals[animal.AnimalId]" @oninput="() => ToggleSelection(animal)" />
+                            </td>
                             <td>@animal.AnimalId</td>
                             <td>
                                 @if (editingAnimal != null && editingAnimal.AnimalId == animal.AnimalId)
@@ -217,6 +221,35 @@
     </div>
 </div>
 
+
+<!-- Grouped Animals Table -->
+<div class="col-md-12 mt-4">
+    <h4>Grouped Animals</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Breed</th>
+                <th>Selected Animals</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var groupedAnimal in GetGroupedAnimals())
+            {
+                <tr>
+                    <td>@groupedAnimal.Breed</td>
+                    <td>
+                        @foreach (var selectedAnimal in groupedAnimal.SelectedAnimals)
+                        {
+                            <div>@selectedAnimal.Name</div>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
 @code {
     private List<Models.Animal> animalList;
     private List<Models.Animal> filteredAnimalList;
@@ -235,11 +268,14 @@
     private int PageSize = 10;
     private int CurrentPage = 1;
 
+    // Dictionary to track the selected state of each animal
+    private Dictionary<int, bool> selectedAnimals = new Dictionary<int, bool>();
+
     private IEnumerable<Models.Animal> GetVisibleAnimals()
     {
         return filteredAnimalList
-        .Skip((CurrentPage - 1) * PageSize)
-        .Take(PageSize);
+            .Skip((CurrentPage - 1) * PageSize)
+            .Take(PageSize);
     }
 
     private int TotalPages()
@@ -251,7 +287,7 @@
     private void ChangePage(int curpage)
     {
         CurrentPage = curpage;
-        StateHasChanged(); 
+        StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()
@@ -259,20 +295,26 @@
         await AnimalService.LoadAnimalsAsync();
         animalList = AnimalService.GetAnimals();
         filteredAnimalList = new List<Models.Animal>(animalList);
+
+        // Initialize the selected state for each animal
+        foreach (var animal in animalList)
+        {
+            selectedAnimals[animal.AnimalId] = false;
+        }
     }
 
     private void FilterAnimals()
     {
         // Apply filters based on criteria
         filteredAnimalList = animalList
-        .Where(a =>
-        (string.IsNullOrEmpty(filterName) || a.Name.Contains(filterName, StringComparison.OrdinalIgnoreCase)) &&
-        (string.IsNullOrEmpty(filterBreed) || a.Breed.Contains(filterBreed, StringComparison.OrdinalIgnoreCase)) &&
-        (!filterBirthDate.HasValue || a.BirthDate.Date == filterBirthDate.Value.Date) &&
-        (string.IsNullOrEmpty(filterSex) || a.Sex == filterSex) &&
-        (!filterPrice.HasValue || a.Price == filterPrice.Value) &&
-        (string.IsNullOrEmpty(filterStatus) || a.Status == filterStatus))
-        .ToList();
+            .Where(a =>
+                (string.IsNullOrEmpty(filterName) || a.Name.Contains(filterName, StringComparison.OrdinalIgnoreCase)) &&
+                (string.IsNullOrEmpty(filterBreed) || a.Breed.Contains(filterBreed, StringComparison.OrdinalIgnoreCase)) &&
+                (!filterBirthDate.HasValue || a.BirthDate.Date == filterBirthDate.Value.Date) &&
+                (string.IsNullOrEmpty(filterSex) || a.Sex == filterSex) &&
+                (!filterPrice.HasValue || a.Price == filterPrice.Value) &&
+                (string.IsNullOrEmpty(filterStatus) || a.Status == filterStatus))
+            .ToList();
     }
 
     // Add Animal
@@ -288,17 +330,16 @@
     {
         editingAnimal = animal;
         newAnimal = new Models.Animal
-            {
-                AnimalId = animal.AnimalId,
-                Name = animal.Name,
-                Breed = animal.Breed,
-                BirthDate = animal.BirthDate,
-                Sex = animal.Sex,
-                Price = animal.Price,
-                Status = animal.Status
-            };
+        {
+            AnimalId = animal.AnimalId,
+            Name = animal.Name,
+            Breed = animal.Breed,
+            BirthDate = animal.BirthDate,
+            Sex = animal.Sex,
+            Price = animal.Price,
+            Status = animal.Status
+        };
     }
-
 
     // Update Animal
     private async Task UpdateAnimal()
@@ -320,4 +361,56 @@
         await AnimalService.DeleteAnimalAsync(animalId);
         FilterAnimals();
     }
+
+    // Checkbox selection handling
+    private void ToggleSelection(Models.Animal animal)
+    {
+        selectedAnimals[animal.AnimalId] = !selectedAnimals[animal.AnimalId];
+
+        // Update grouped animals table
+        StateHasChanged();
+    }
+
+    // Group animals by breed for the grouped animals table
+private IEnumerable<GroupedAnimal> GetGroupedAnimals()
+{
+    if (filteredAnimalList == null || selectedAnimals == null)
+    {
+        return Enumerable.Empty<GroupedAnimal>();
+    }
+
+    var groupedAnimals = filteredAnimalList
+        .Where(a => selectedAnimals.ContainsKey(a.AnimalId) && selectedAnimals[a.AnimalId])
+        .GroupBy(a => a.Breed)
+        .Select(group => new GroupedAnimal
+        {
+            Breed = group.Key,
+            SelectedAnimals = group.ToList()
+        });
+
+    return groupedAnimals;
 }
+
+
+    // Class to represent grouped animals
+    private class GroupedAnimal
+    {
+        public string Breed { get; set; }
+        public List<Models.Animal> SelectedAnimals { get; set; }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
