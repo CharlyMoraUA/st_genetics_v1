@@ -330,6 +330,7 @@
     private async Task AddAnimal()
     {
         await AnimalService.AddAnimalAsync(newAnimal);
+        selectedAnimals[newAnimal.AnimalId] = false;
         newAnimal = new Models.Animal();
         FilterAnimals();
     }
