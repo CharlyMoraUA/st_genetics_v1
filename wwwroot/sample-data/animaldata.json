@@ -1,0 +1,183 @@
+[
+    {
+      "AnimalId": 1,
+      "Name": "Lion",
+      "Breed": "African Lion",
+      "BirthDate": "2018-03-15T10:30:00",
+      "Sex": "Male",
+      "Price": 500,
+      "Status": "Active"
+    },
+    {
+      "AnimalId": 2,
+      "Name": "Tiger",
+      "Breed": "Bengal Tiger",
+      "BirthDate": "2019-05-20T14:45:00",
+      "Sex": "Female",
+      "Price": 600,
+      "Status": "Active"
+    },
+    {
+      "AnimalId": 3,
+      "Name": "Elephant",
+      "Breed": "African Elephant",
+      "BirthDate": "2017-11-10T08:15:00",
+      "Sex": "Male",
+      "Price": 800,
+      "Status": "Inactive"
+    },
+    {
+      "AnimalId": 4,
+      "Name": "Giraffe",
+      "Breed": "Reticulated Giraffe",
+      "BirthDate": "2018-07-05T12:00:00",
+      "Sex": "Female",
+      "Price": 700,
+      "Status": "Active"
+    },
+    {
+      "AnimalId": 5,
+      "Name": "Zebra",
+      "Breed": "Plains Zebra",
+      "BirthDate": "2019-01-25T09:20:00",
+      "Sex": "Male",
+      "Price": 550,
+      "Status": "Active"
+    },
+    {
+      "AnimalId": 6,
+      "Name": "Penguin",
+      "Breed": "Emperor Penguin",
+      "BirthDate": "2020-02-18T13:10:00",
+      "Sex": "Female",
+      "Price": 400,
+      "Status": "Inactive"
+    },
+    {
+      "AnimalId": 7,
+      "Name": "Kangaroo",
+      "Breed": "Red Kangaroo",
+      "BirthDate": "2018-09-30T11:25:00",
+      "Sex": "Male",
+      "Price": 650,
+      "Status": "Active"
+    },
+    {
+      "AnimalId": 8,
+      "Name": "Gorilla",
+      "Breed": "Western Gorilla",
+      "BirthDate": "2019-04-12T15:00:00",
+      "Sex": "Female",
+      "Price": 750,
+      "Status": "Active"
+    },
+    {
+      "AnimalId": 9,
+      "Name": "Panda",
+      "Breed": "Giant Panda",
+      "BirthDate": "2017-12-08T07:45:00",
+      "Sex": "Male",
+      "Price": 900,
+      "Status": "Inactive"
+    },
+    {
+      "AnimalId": 10,
+      "Name": "Koala",
+      "Breed": "Queensland Koala",
+      "BirthDate": "2018-06-22T10:55:00",
+      "Sex": "Female",
+      "Price": 600,
+      "Status": "Active"
+    },
+    {
+      "AnimalId": 11,
+      "Name": "Hippopotamus",
+      "Breed": "Common Hippopotamus",
+      "BirthDate": "2019-02-28T14:30:00",
+      "Sex": "Male",
+      "Price": 700,
+      "Status": "Active"
+    },
+    {
+      "AnimalId": 12,
+      "Name": "Cheetah",
+      "Breed": "King Cheetah",
+      "BirthDate": "2020-01-15T09:40:00",
+      "Sex": "Female",
+      "Price": 550,
+      "Status": "Inactive"
+    },
+    {
+      "AnimalId": 13,
+      "Name": "Polar Bear",
+      "Breed": "Alaska Polar Bear",
+      "BirthDate": "2018-10-10T11:20:00",
+      "Sex": "Male",
+      "Price": 800,
+      "Status": "Active"
+    },
+    {
+      "AnimalId": 14,
+      "Name": "Rhinoceros",
+      "Breed": "White Rhinoceros",
+      "BirthDate": "2019-07-03T13:15:00",
+      "Sex": "Female",
+      "Price": 750,
+      "Status": "Active"
+    },
+    {
+      "AnimalId": 15,
+      "Name": "Red Panda",
+      "Breed": "Himalayan Red Panda",
+      "BirthDate": "2017-11-28T08:50:00",
+      "Sex": "Male",
+      "Price": 500,
+      "Status": "Inactive"
+    },
+    {
+      "AnimalId": 16,
+      "Name": "Sea Lion",
+      "Breed": "California Sea Lion",
+      "BirthDate": "2018-05-05T12:05:00",
+      "Sex": "Female",
+      "Price": 600,
+      "Status": "Active"
+    },
+    {
+      "AnimalId": 17,
+      "Name": "Hawk",
+      "Breed": "Red-tailed Hawk",
+      "BirthDate": "2019-09-20T10:00:00",
+      "Sex": "Male",
+      "Price": 450,
+      "Status": "Active"
+    },
+    {
+      "AnimalId": 18,
+      "Name": "Ostrich",
+      "Breed": "Common Ostrich",
+      "BirthDate": "2020-03-18T14:55:00",
+      "Sex": "Female",
+      "Price": 550,
+      "Status": "Inactive"
+    },
+    {
+      "AnimalId": 19,
+      "Name": "Leopard",
+      "Breed": "Amur Leopard",
+      "BirthDate": "2018-08-15T09:35:00",
+      "Sex": "Male",
+      "Price": 700,
+      "Status": "Active"
+    },
+    {
+      "AnimalId": 20,
+      "Name": "Kangaroo",
+      "Breed": "Red Kangaroo",
+      "BirthDate": "2019-04-12T15:30:00",
+      "Sex": "Female",
+      "Price": 650,
+      "Status": "Active"
+    }
+  ]
+  

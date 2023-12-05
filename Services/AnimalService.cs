@@ -1,19 +1,24 @@
-
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Threading.Tasks;
 using st_genetics_v1.Models;
 
 namespace st_genetics_v1.Services
 {
-
     public class AnimalService
     {
         private List<Animal> _animals;
+        private readonly string _filePath;
+        private readonly HttpClient _httpClient;
 
-        public AnimalService()
+        public AnimalService(HttpClient httpClient)
         {
-            // Initialize the list with 20 fictitious animals
-            _animals = GenerateFictitiousData();
+            _filePath = Path.Combine(AppContext.BaseDirectory, "sample-data/animaldata.json");
+            _httpClient = httpClient;
         }
 
         public List<Animal> GetAnimals()
@@ -21,31 +26,34 @@ namespace st_genetics_v1.Services
             return _animals;
         }
 
-        // Other CRUD operations go here...
 
-        private List<Animal> GenerateFictitiousData()
+        public async Task LoadAnimalsAsync()
         {
-            var animals = new List<Animal>();
-            var random = new Random();
-
-            for (int i = 1; i <= 20; i++)
+            try
             {
-                var animal = new Animal
-                {
-                    AnimalId = i,
-                    Name = $"Animal {i}",
-                    Breed = $"Breed {random.Next(1, 5)}",
-                    BirthDate = DateTime.Now.AddYears(-random.Next(1, 5)),
-                    Sex = (i % 2 == 0) ? "Male" : "Female",
-                    Price = random.Next(100, 1000),
-                    Status = (i % 3 == 0) ? "Inactive" : "Active"
-                };
-
-                animals.Add(animal);
+                _animals = await _httpClient.GetFromJsonAsync<List<Animal>>(_filePath);
+                Console.WriteLine("_animals");
+                Console.WriteLine(_animals);
+                Console.WriteLine("_animals");
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading animals: {ex.Message}");
+            }
+        }
 
-            return animals;
+
+        private void WriteToJson(List<Animal> animals, string filePath)
+        {
+            try
+            {
+                var jsonData = JsonSerializer.Serialize(animals, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText(filePath, jsonData);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error writing to JSON file: {ex.Message}");
+            }
         }
     }
-
 }
